@@ -12,7 +12,11 @@ Sản phẩm - {{ category.name }}
     <div>
         {% for product in products %}
             <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-                <h3>{{ product.name }}</h3>
+                <h3>
+    <a href="{% url 'product_detail' product.id %}">
+        {{ product.name }}
+    </a>
+</h3>
                 <p>Giá: {{ product.price }} VNĐ</p>
 
                 <button class="add-to-cart-btn"

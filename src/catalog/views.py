@@ -54,3 +54,12 @@ def product_by_category(request, category_id):
     }
 
     return render(request, 'product_by_category.html', context)
+
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id, is_active=True)
+
+    context = {
+        'product': product,
+    }
+
+    return render(request, 'product_detail.html', context)

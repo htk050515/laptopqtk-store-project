@@ -40,7 +40,7 @@ INSTALLED_APPS = [
 
     'users.apps.UsersConfig',   #Khai báo app users vào hệ thống
     'catalog', #Khai báo app catalog vào hệ thống
-    'orders', #Khai báo app orders vào hệ thống
+    'orders.apps.OrdersConfig', #Khai báo app orders vào hệ thống
 ]
 
 MIDDLEWARE = [
@@ -58,7 +58,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

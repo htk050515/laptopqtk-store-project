@@ -27,6 +27,15 @@ class Order(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def update_total_price(self):
+        total = sum(
+            item.price * item.quantity # tính tổng tiền từ các item
+            for item in self.items.all() 
+        )
+        self.total_price = total
+        self.save()
+
+
     class Meta:
         ordering = ['-created_at']
 
@@ -49,3 +58,5 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} x {self.quantity}"
+
+

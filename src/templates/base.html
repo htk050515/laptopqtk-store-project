@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}LaptopQTK Store{% endblock %}</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+    {% include 'partials/header.html' %}
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% include 'partials/footer.html' %}
+
+</body>
+</html>
+
+{% comment %} {% block %} → cho các trang con ghi đè
+
+{% include %} → tách header/footer
+
+{% load static %} → dùng CSS, JS {% endcomment %}

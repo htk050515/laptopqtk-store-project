@@ -15,6 +15,43 @@
         {{ total_revenue|intcomma }} VNĐ
     </span>
 </div>
+<div style="background:#f6ffed;border:1px solid #b7eb8f;padding:12px 16px;margin-bottom:15px;border-radius:6px;">
+    💰 <strong>Tổng doanh thu (đã duyệt):</strong>
+    <span style="color:#389e0d;font-weight:bold;">
+        {{ total_revenue|intcomma }} VNĐ
+    </span>
+</div>
 
+<!-- BIỂU ĐỒ -->
+<div style="background:#fff;padding:16px;border:1px solid #ddd;border-radius:6px;margin-bottom:20px;">
+    <h3>📊 Doanh thu theo ngày</h3>
+    <canvas id="revenueChart" height="90"></canvas>
+</div>
+
+{{ block.super }}
+
+<!-- CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const labels = {{ chart_labels|safe }};
+const values = {{ chart_values|safe }};
+
+if (labels.length > 0) {
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Doanh thu (VNĐ)',
+                data: values,
+                borderColor: '#1890ff',
+                backgroundColor: 'rgba(24,144,255,0.15)',
+                tension: 0.3,
+                fill: true
+            }]
+        }
+    });
+}
+</script>
 {{ block.super }}
 {% endblock %}

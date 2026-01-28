@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db.models import Sum
 from .models import Order, OrderItem
+from django.db.models.functions import TruncDate
 
 
 class OrderItemInline(admin.TabularInline):
@@ -11,30 +12,31 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'user',
-        'total_price',
-        'status',
-        'created_at'
-    )
-
+    list_display = ('id', 'user', 'total_price', 'status', 'created_at')
     list_filter = ('status', 'created_at')
-    search_fields = ('user__username',)
     date_hierarchy = 'created_at'
 
-    readonly_fields = ('total_price', 'created_at')
-    inlines = [OrderItemInline]
 
     def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
+        response = super().changelist_view(request, extra_context)
 
-        total_revenue = (
-            Order.objects
-            .filter(status=Order.STATUS_APPROVED)
-            .aggregate(total=Sum('total_price'))
-            .get('total') or 0
-        )
+        try:
+            qs = (
+                Order.objects
+                .filter(status='approved')
+                .annotate(date=TruncDate('created_at'))
+                .values('date')
+                .annotate(total=Sum('total_price'))
+                .order_by('date')
+            )
 
-        extra_context['total_revenue'] = total_revenue
-        return super().changelist_view(request, extra_context=extra_context)
+            dates = [q['date'].strftime('%d/%m') for q in qs]
+            totals = [float(q['total']) for q in qs]
+
+            response.context_data['chart_labels'] = dates
+            response.context_data['chart_values'] = totals
+
+        except Exception:
+            pass
+
+        return response

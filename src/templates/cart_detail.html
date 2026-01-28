@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Giỏ hàng{% endblock %}
+
+{% block content %}
+
+<h2>Giỏ hàng của bạn</h2>
+
+{% if cart_items %}
+    <table border="1" cellpadding="10">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, item in cart_items.items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.price }} VNĐ</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.total }} VNĐ</td>
+                    <td>
+                        <button class="remove-item-btn"
+                                data-product-id="{{ key }}">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Tổng tiền: {{ total_price }} VNĐ</h3>
+
+{% else %}
+    <p>Giỏ hàng trống.</p>
+{% endif %}
+
+<script>
+document.querySelectorAll('.remove-item-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const productId = this.dataset.productId;
+
+        fetch(`/remove-from-cart/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

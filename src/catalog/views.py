@@ -10,6 +10,8 @@ from orders.models import Order, OrderItem
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
 from django.db.models.functions import TruncDate
+from django.core.paginator import Paginator
+
 
 
 
@@ -60,8 +62,12 @@ def home(request):
 
     categories = Category.objects.filter(is_active=True)
 
+    paginator = Paginator(products, 6)  # 6 sản phẩm / trang
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'products': products,
+        'page_obj': page_obj,
         'categories': categories,
     }
 

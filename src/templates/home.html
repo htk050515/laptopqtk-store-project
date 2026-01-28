@@ -48,10 +48,26 @@
 
     <button type="submit">Lọc</button>
 </form>
+<div style="margin-top:20px; text-align:center;">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|cut:'page=' }}">
+            ← Trước
+        </a>
+    {% endif %}
+
+    <span>Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|cut:'page=' }}">
+            Sau →
+        </a>
+    {% endif %}
+</div>
+
 
 
 <div>
-    {% for product in products %}
+    {% for product in page_obj %}
         <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
 
             <h3>

@@ -20,35 +20,54 @@
     </thead>
     <tbody>
         {% for key, item in cart_items.items %}
-        <tr>
+        <tr id="row-{{ key }}">
             <td>
                 {% if item.image %}
                     <img src="{{ item.image }}" width="60"><br>
                 {% endif %}
                 {{ item.name }}
             </td>
-            <td>{{ item.price }} VNĐ</td>
-            <td>
-                <button class="qty-btn"
-                data-id="{{ key }}"
-                data-action="decrease">−</button>
-                {{ item.quantity }}
-                <button class="qty-btn"
-                data-id="{{ key }}"
-                data-action="increase">+</button>            
-            </td>
-            <td>{{ item.total }} VNĐ</td>
-            <td>
-                <button class="remove-btn"
-        data-id="{{ key }}">Xóa</button>
 
+            <td>{{ item.price }} VNĐ</td>
+
+            <td>
+                <button
+                    class="qty-btn"
+                    data-id="{{ key }}"
+                    data-action="decrease">
+                    −
+                </button>
+
+                <span id="qty-{{ key }}">{{ item.quantity }}</span>
+
+                <button
+                    class="qty-btn"
+                    data-id="{{ key }}"
+                    data-action="increase">
+                    +
+                </button>
+            </td>
+
+            <td>
+                <span id="item-total-{{ key }}">{{ item.total }}</span> VNĐ
+            </td>
+
+            <td>
+                <button
+                    class="remove-btn"
+                    data-id="{{ key }}">
+                    Xóa
+                </button>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<h3>Tổng tiền: {{ total_price }} VNĐ</h3>
+<h3>
+    Tổng tiền:
+    <span id="cart-total">{{ total_price }}</span> VNĐ
+</h3>
 
 {% else %}
 <p>Giỏ hàng trống.</p>
@@ -67,9 +86,13 @@
 
 {% endblock %}
 
-{% if cart_items %}
+
 {% block extra_js %}
+
+{% if cart_items %}
+
 <script src="{% static 'js/cart.js' %}"></script>
-{% endblock %}
+
 {% endif %}
 
+{% endblock %}

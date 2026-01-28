@@ -238,22 +238,33 @@ def cart_detail(request):
 def update_cart_quantity(request, product_id):
     cart = request.session.get('cart', {})
     pid = str(product_id)
-
     action = request.POST.get('action')
 
-    if pid in cart:
-        if action == 'increase':
-            cart[pid]['quantity'] += 1
-        elif action == 'decrease':
-            cart[pid]['quantity'] -= 1
-            if cart[pid]['quantity'] <= 0:
-                del cart[pid]
+    if pid not in cart:
+        return JsonResponse({'success': False})
+
+    if action == 'increase':
+        cart[pid]['quantity'] += 1
+    elif action == 'decrease':
+        cart[pid]['quantity'] -= 1
+        if cart[pid]['quantity'] <= 0:
+            del cart[pid]
 
     request.session['cart'] = cart
     request.session.modified = True
 
+    item_total = 0
+    cart_total = 0
+
+    for k, item in cart.items():
+        item_total = item['price'] * item['quantity'] if k == pid else item_total
+        cart_total += item['price'] * item['quantity']
+
     return JsonResponse({
         'success': True,
-        'message': 'Đã cập nhật giỏ hàng'
+        'quantity': cart.get(pid, {}).get('quantity', 0),
+        'item_total': item_total,
+        'cart_total': cart_total
     })
+
 

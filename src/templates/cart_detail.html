@@ -62,4 +62,16 @@ document.querySelectorAll('.remove-item-btn').forEach(button => {
 });
 </script>
 
+{% if user.is_authenticated %}
+    <form action="{% url 'create_order' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Đặt hàng</button>
+    </form>
+{% else %}
+    <p>
+        <a href="/login/">Đăng nhập</a> để đặt hàng
+    </p>
+{% endif %}
+
 {% endblock %}
+

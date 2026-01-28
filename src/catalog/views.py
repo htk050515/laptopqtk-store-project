@@ -5,6 +5,9 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import render
 from .models import Category, Product
+from django.contrib.auth.decorators import login_required
+from orders.models import Order, OrderItem
+
 
 def add_to_cart(request, product_id): #Thêm sản phẩm vào giỏ hàng
     cart = Cart(request) #Lấy cart từ session hiện tại
@@ -82,3 +85,41 @@ def remove_from_cart(request, product_id): #Xóa sản phẩm khỏi giỏ hàng
     return JsonResponse({
         'success': True
     })
+
+@login_required #Yêu cầu đăng nhập để tạo đơn hàng
+def create_order(request): #Tạo đơn hàng từ giỏ hàng
+    cart = Cart(request)
+
+    if not cart.get_items():
+        return redirect('cart_detail')
+
+    # Tạo Order
+    order = Order.objects.create(
+        user=request.user,
+        total_price=cart.get_total_price(),
+        status='pending'
+    )
+
+    # Tạo OrderItem
+    for product_id, item in cart.get_items().items():
+        OrderItem.objects.create(
+            order=order,
+            product_id=product_id,
+            price=item['price'],
+            quantity=item['quantity']
+        )
+
+    # Xóa giỏ hàng sau khi đặt
+    cart.clear()
+
+    return render(request, 'order_success.html', {'order': order})
+
+@login_required
+def my_orders(request):#Xem danh sách đơn hàng của người dùng
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+
+    context = {
+        'orders': orders
+    }
+
+    return render(request, 'my_orders.html', context)

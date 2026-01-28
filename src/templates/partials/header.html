@@ -8,6 +8,7 @@
 
         {% if user.is_authenticated %}
             <span>Xin chào, {{ user.username }}</span>
+            <a href="{% url 'my_orders' %}">Đơn hàng của tôi</a>
             <a href="#">Đăng xuất</a>
         {% else %}
             <a href="#">Đăng nhập</a>

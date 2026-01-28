@@ -69,7 +69,11 @@
 <div>
     {% for product in page_obj %}
         <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-
+            {% if product.image %}
+                <img src="{{ product.image.url }}"
+                width="200"
+                style="display:block; margin-bottom:10px;">
+            {% endif %}
             <h3>
                 <a href="{% url 'product_detail' product.id %}">
                     {{ product.name }}

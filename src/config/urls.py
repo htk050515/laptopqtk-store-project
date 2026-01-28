@@ -28,6 +28,9 @@ urlpatterns = [
 # Cấu hình phục vụ ảnh media trong quá trình phát triển
 # Chỉ khi DEBUG=True mới cho Django serve media
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(
+        settings.MEDIA_URL, 
+        document_root=settings.MEDIA_ROOT
+    )
 
 

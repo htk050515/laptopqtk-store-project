@@ -7,6 +7,7 @@ from django.shortcuts import render
 from .models import Category, Product
 from django.contrib.auth.decorators import login_required
 from orders.models import Order, OrderItem
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 def add_to_cart(request, product_id): #Thêm sản phẩm vào giỏ hàng
@@ -138,3 +139,18 @@ def order_detail(request, order_id):
     }
 
     return render(request, 'order_detail.html', context)
+
+
+@staff_member_required #Chỉ admin mới xem được thống kê đơn hàng
+def order_statistics(request): #Thống kê số lượng đơn hàng theo trạng thái
+    pending_count = Order.objects.filter(status='pending').count()
+    approved_count = Order.objects.filter(status='approved').count()
+    rejected_count = Order.objects.filter(status='rejected').count()
+
+    context = {
+        'pending': pending_count,
+        'approved': approved_count,
+        'rejected': rejected_count,
+    }
+
+    return render(request, 'order_statistics.html', context)

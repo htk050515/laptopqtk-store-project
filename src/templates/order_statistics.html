@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Thống kê đơn hàng{% endblock %}
+
+{% block content %}
+
+<h2>Thống kê đơn hàng</h2>
+
+<canvas id="orderChart" width="400" height="200"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('orderChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Pending', 'Approved', 'Rejected'],
+        datasets: [{
+            label: 'Số lượng đơn hàng',
+            data: [
+                {{ pending }},
+                {{ approved }},
+                {{ rejected }}
+            ],
+        }]
+    },
+});
+</script>
+
+{% endblock %}

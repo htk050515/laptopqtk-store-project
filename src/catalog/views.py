@@ -4,7 +4,7 @@ from .cart import Cart
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import render
-
+from .models import Category, Product
 
 def add_to_cart(request, product_id):
     cart = Cart(request) #Lấy cart từ session hiện tại
@@ -30,4 +30,12 @@ def add_to_cart_ajax(request, product_id):
 
 
 def home(request):
-    return render(request, 'home.html')
+    categories = Category.objects.filter(is_active=True) #Chỉ hiển thị dữ liệu đang bán
+    products = Product.objects.filter(is_active=True)
+
+    context = {
+        'categories': categories,
+        'products': products,
+    }
+
+    return render(request, 'home.html', context)

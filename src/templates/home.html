@@ -3,6 +3,57 @@
 {% block title %}Trang chủ{% endblock %}
 
 {% block content %}
-<h2>Trang chủ</h2>
-<p>Frontend nền tảng đã hoạt động.</p>
+
+<h2>Danh mục sản phẩm</h2>
+
+<ul>
+    {% for category in categories %}
+        <li>{{ category.name }}</li>
+    {% empty %}
+        <li>Chưa có danh mục</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h2>Sản phẩm mới</h2>
+
+<div>
+    {% for product in products %}
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            <h3>{{ product.name }}</h3>
+            <p>Danh mục: {{ product.category.name }}</p>
+            <p>Giá: {{ product.price }} VNĐ</p>
+
+            <button class="add-to-cart-btn"
+                    data-product-id="{{ product.id }}">
+                Thêm vào giỏ
+            </button>
+        </div>
+    {% empty %}
+        <p>Chưa có sản phẩm</p>
+    {% endfor %}
+</div>
+
 {% endblock %}
+
+<script>
+document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const productId = this.dataset.productId;
+
+        fetch(`/add-to-cart/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+            }
+        });
+    });
+});
+</script>

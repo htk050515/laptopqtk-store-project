@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Sum
 from .models import Order, OrderItem
 
 
@@ -10,17 +11,30 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'status', 'total_price', 'created_at')
-    list_filter = ('status', 'created_at')
-    date_hierarchy = 'created_at'
-    inlines = [OrderItemInline]
-
-    readonly_fields = (
+    list_display = (
+        'id',
         'user',
         'total_price',
-        'created_at',
-        'stock_deducted',
+        'status',
+        'created_at'
     )
 
-    def has_add_permission(self, request):
-        return False
+    list_filter = ('status', 'created_at')
+    search_fields = ('user__username',)
+    date_hierarchy = 'created_at'
+
+    readonly_fields = ('total_price', 'created_at')
+    inlines = [OrderItemInline]
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+
+        total_revenue = (
+            Order.objects
+            .filter(status=Order.STATUS_APPROVED)
+            .aggregate(total=Sum('total_price'))
+            .get('total') or 0
+        )
+
+        extra_context['total_revenue'] = total_revenue
+        return super().changelist_view(request, extra_context=extra_context)

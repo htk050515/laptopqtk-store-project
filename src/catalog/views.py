@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect
 from .models import Product
-from .cart import Cart
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import render
@@ -11,6 +10,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
 from django.db.models.functions import TruncDate
 from django.core.paginator import Paginator
+from django.contrib import messages
+from django.db import transaction
+
 
 
 @require_POST
@@ -117,22 +119,30 @@ def remove_from_cart(request, product_id):
     return JsonResponse({'success': False}, status=400)
 
 
-@login_required #Yêu cầu đăng nhập để tạo đơn hàng
-def create_order(request): #Tạo đơn hàng từ giỏ hàng
-    cart = Cart(request)
+@login_required
+@transaction.atomic #Tránh tạo Order không có Item
+def create_order(request):
+    cart = request.session.get('cart', {})
 
-    if not cart.get_items():
+    # 1. Không cho đặt nếu giỏ trống
+    if not cart:
+        messages.error(request, 'Giỏ hàng trống, không thể đặt hàng')
         return redirect('cart_detail')
 
-    # Tạo Order
+    # 2. Tính tổng tiền từ snapshot cart
+    total_price = 0
+    for item in cart.values():
+        total_price += item['price'] * item['quantity']
+
+    # 3. Tạo Order
     order = Order.objects.create(
         user=request.user,
-        total_price=cart.get_total_price(),
+        total_price=total_price,
         status='pending'
     )
 
-    # Tạo OrderItem
-    for product_id, item in cart.get_items().items():
+    # 4. Tạo OrderItem (snapshot)
+    for product_id, item in cart.items():
         OrderItem.objects.create(
             order=order,
             product_id=product_id,
@@ -140,11 +150,13 @@ def create_order(request): #Tạo đơn hàng từ giỏ hàng
             quantity=item['quantity']
         )
 
-    # Xóa giỏ hàng sau khi đặt
-    cart.clear()
+    # 5. Clear cart sau khi đặt
+    request.session['cart'] = {}
+    request.session.modified = True
 
-    return render(request, 'order_success.html', {'order': order})
-
+    return render(request, 'order_success.html', {
+        'order': order
+    })
 @login_required
 def my_orders(request):#Xem danh sách đơn hàng của người dùng
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
@@ -206,31 +218,6 @@ def revenue_statistics(request):
     }
 
     return render(request, 'revenue_statistics.html', context)
-
-    def add_to_cart(request, product_id):
-        product = get_object_or_404(Product, id=product_id)
-
-        cart = request.session.get('cart', {})
-
-        pid = str(product_id)
-
-        if pid in cart:
-            cart[pid]['quantity'] += 1
-        else:
-            cart[pid] = {
-                'name': product.name,
-                'price': float(product.price),
-                'quantity': 1,
-                'image': product.image.url if product.image else ''
-            }
-
-        request.session['cart'] = cart
-        request.session.modified = True
-
-    return JsonResponse({
-        'success': True,
-        'message': 'Đã thêm vào giỏ hàng'
-    })
 
 def cart_detail(request):
     cart = request.session.get('cart', {})

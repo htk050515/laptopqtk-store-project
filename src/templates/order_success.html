@@ -10,6 +10,7 @@
 <p>Tổng tiền: {{ order.total_price }} VNĐ</p>
 <p>Trạng thái: {{ order.status }}</p>
 
+<a href="{% url 'my_orders' %}">Xem đơn hàng của tôi</a>
 <a href="{% url 'home' %}">Tiếp tục mua sắm</a>
 
 {% endblock %}

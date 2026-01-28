@@ -29,15 +29,19 @@
             </td>
             <td>{{ item.price }} VNĐ</td>
             <td>
-                <button onclick="updateQty('{{ key }}', 'decrease', csrfToken)">−</button>
+                <button class="qty-btn"
+                data-id="{{ key }}"
+                data-action="decrease">−</button>
                 {{ item.quantity }}
-                <button onclick="updateQty('{{ key }}', 'increase', csrfToken)">+</button>
+                <button class="qty-btn"
+                data-id="{{ key }}"
+                data-action="increase">+</button>            
             </td>
             <td>{{ item.total }} VNĐ</td>
             <td>
-                <button onclick="removeFromCart('{{ key }}', csrfToken)">
-                    Xóa
-                </button>
+                <button class="remove-btn"
+        data-id="{{ key }}">Xóa</button>
+
             </td>
         </tr>
         {% endfor %}
@@ -63,9 +67,9 @@
 
 {% endblock %}
 
+{% if cart_items %}
 {% block extra_js %}
-<script>
-    const csrfToken = '{{ csrf_token }}';
-</script>
 <script src="{% static 'js/cart.js' %}"></script>
 {% endblock %}
+{% endif %}
+

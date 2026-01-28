@@ -208,24 +208,24 @@ def revenue_statistics(request):
     return render(request, 'revenue_statistics.html', context)
 
     def add_to_cart(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+        product = get_object_or_404(Product, id=product_id)
 
-    cart = request.session.get('cart', {})
+        cart = request.session.get('cart', {})
 
-    pid = str(product_id)
+        pid = str(product_id)
 
-    if pid in cart:
-        cart[pid]['quantity'] += 1
-    else:
-        cart[pid] = {
-            'name': product.name,
-            'price': float(product.price),
-            'quantity': 1,
-            'image': product.image.url if product.image else ''
-        }
+        if pid in cart:
+            cart[pid]['quantity'] += 1
+        else:
+            cart[pid] = {
+                'name': product.name,
+                'price': float(product.price),
+                'quantity': 1,
+                'image': product.image.url if product.image else ''
+            }
 
-    request.session['cart'] = cart
-    request.session.modified = True
+        request.session['cart'] = cart
+        request.session.modified = True
 
     return JsonResponse({
         'success': True,

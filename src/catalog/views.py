@@ -39,3 +39,18 @@ def home(request):
     }
 
     return render(request, 'home.html', context)
+
+
+def product_by_category(request, category_id):
+    category = get_object_or_404(Category, id=category_id, is_active=True) #Tránh truy cập danh mục không tồn tại
+    products = Product.objects.filter(
+        category=category,
+        is_active=True
+    )
+
+    context = {
+        'category': category, #để hiển thị tên danh mục
+        'products': products, #danh sách sản phẩm thuộc danh mục
+    }
+
+    return render(request, 'product_by_category.html', context)

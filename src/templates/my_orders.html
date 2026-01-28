@@ -26,7 +26,10 @@
                     </td>
                     <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
                     <td>{{ order.total_price }} VNĐ</td>
-                    <td>{{ order.status }}</td>
+                    <td class="status-{{ order.status }}">
+                         {{ order.status }}
+                    </td>
+
                 </tr>
             {% endfor %}
         </tbody>

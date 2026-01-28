@@ -1,28 +1,36 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>{% block title %}LaptopQTK Store{% endblock %}</title>
-
-    {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 
-    {% include 'partials/header.html' %}
+<header>
+    <a href="{% url 'home' %}">Trang chủ</a>
+    <a href="{% url 'cart_detail' %}">Giỏ hàng</a>
 
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+    {% if user.is_authenticated %}
+        <a href="{% url 'my_orders' %}">Đơn hàng</a>
+        {% if user.is_staff %}
+            <a href="{% url 'order_statistics' %}">Thống kê</a>
+            <a href="{% url 'revenue_statistics' %}">Doanh thu</a>
+        {% endif %}
+        <span>Xin chào, {{ user.username }}</span>
+        <a href="{% url 'logout' %}">Đăng xuất</a>
+    {% else %}
+        <a href="{% url 'login' %}">Đăng nhập</a>
+    {% endif %}
+</header>
 
-    {% include 'partials/footer.html' %}
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+<footer>
+    © 2026 LaptopQTK Store
+</footer>
 
 </body>
 </html>
-
-{% comment %} {% block %} → cho các trang con ghi đè
-
-{% include %} → tách header/footer
-
-{% load static %} → dùng CSS, JS {% endcomment %}

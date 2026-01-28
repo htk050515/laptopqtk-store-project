@@ -13,29 +13,30 @@ from django.db.models.functions import TruncDate
 from django.core.paginator import Paginator
 
 
-
-
-def add_to_cart(request, product_id): #Thêm sản phẩm vào giỏ hàng
-    cart = Cart(request) #Lấy cart từ session hiện tại
-    product = get_object_or_404(Product, id=product_id) #Lấy sản phẩm hoặc trả về 404 nếu không tồn tại
-
-    cart.add(product_id=product.id, quantity=1)
-
-    return redirect('cart_detail') #Chuyển hướng về trang chi tiết giỏ hàng
-
-@require_POST #Bảo mật, không cho GET thêm giỏ hàng
-def add_to_cart_ajax(request, product_id): #Thêm sản phẩm vào giỏ hàng qua AJAX
-    cart = Cart(request)
+@require_POST
+def add_to_cart(request, product_id):
+    cart = request.session.get('cart', {})
     product = get_object_or_404(Product, id=product_id)
+    pid = str(product_id)
 
-    cart.add(product_id=product.id, quantity=1)
+    if pid in cart:
+        cart[pid]['quantity'] += 1
+    else:
+        cart[pid] = {
+            'name': product.name,
+            'price': float(product.price),
+            'quantity': 1,
+            'image': product.image.url if product.image else ''
+        }
+
+    request.session['cart'] = cart
+    request.session.modified = True
 
     return JsonResponse({
         'success': True,
-        'message': 'Đã thêm sản phẩm vào giỏ hàng',
-        'cart_total': cart.get_total_price(),
-        'cart_count': sum(item['quantity'] for item in cart.get_items().values()) #Dùng để update icon giỏ hàng trên header
+        'cart_count': sum(item['quantity'] for item in cart.values())
     })
+
 
 
 def home(request):
@@ -98,22 +99,6 @@ def product_detail(request, product_id): #Xem chi tiết sản phẩm
 
     return render(request, 'product_detail.html', context)
 
-def cart_detail(request):
-    cart = request.session.get('cart', {})
-    total_price = 0
-
-    # Tính thành tiền cho từng item
-    for item in cart.values():
-        item['total'] = item['price'] * item['quantity']
-        total_price += item['total']
-
-    context = {
-        'cart_items': cart,
-        'total_price': total_price
-    }
-
-    return render(request, 'cart_detail.html', context)
-    
 @require_POST
 def remove_from_cart(request, product_id):
     if request.method == 'POST':
@@ -250,13 +235,15 @@ def revenue_statistics(request):
 def cart_detail(request):
     cart = request.session.get('cart', {})
 
+    print  ('🧾 CART IN cart_detail =', cart)
+
     total_price = 0
     for item in cart.values():
-        total_price += item['price'] * item['quantity']
+        item['total'] = item['price'] * item['quantity']
+        total_price += item['total']
 
-    context = {
-        'cart': cart,
+    return render(request, 'cart_detail.html', {
+        'cart_items': cart,
         'total_price': total_price
-    }
+    })
 
-    return render(request, 'cart_detail.html', context)

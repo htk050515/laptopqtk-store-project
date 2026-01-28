@@ -17,27 +17,38 @@ class OrderItemInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'total_price', 'status', 'created_at')
-    list_filter = ('status', 'created_at')
+    list_filter = ('status',)
     date_hierarchy = 'created_at'
 
     def changelist_view(self, request, extra_context=None):
+        # 1️⃣ GỌI SUPER TRƯỚC → LẤY response
+        response = super().changelist_view(request, extra_context)
+
+        # ⚠️ Nếu không có context (VD: redirect), return luôn
+        if not hasattr(response, 'context_data'):
+            return response
+
+        # 2️⃣ TÍNH TOÁN DỮ LIỆU THỐNG KÊ
+        from django.db.models import Sum, F
+        from .models import OrderItem
+
         top_products = (
             OrderItem.objects
             .filter(order__status='approved')
-            .values(
-                'product__id',
-                'product__name'
-                )
-        .annotate(
-            total_qty=Sum('quantity'),
-            revenue=Sum(F('price') * F('quantity'))
+            .values('product__name')
+            .annotate(
+                total_qty=Sum('quantity'),
+                revenue=Sum(F('price') * F('quantity'))
+            )
+            .order_by('-total_qty')[:5]
         )
-        .order_by('-total_qty')[:5]
-)
-        response.context_data.update({
-    'top_products': top_products,
-})
-        response = super().changelist_view(request, extra_context)
+
+        # 3️⃣ UPDATE CONTEXT
+        response.context_data['top_products'] = top_products
+
+        # 4️⃣ RETURN response
+        return response
+
 
         try:
             # ====== KPI ======

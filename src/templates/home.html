@@ -73,7 +73,7 @@
                 <img src="{{ product.image.url }}"
                 width="200"
                 style="display:block; margin-bottom:10px;">
-            {% endif %}
+                {% endif %}
             <h3>
                 <a href="{% url 'product_detail' product.id %}">
                     {{ product.name }}
@@ -112,6 +112,7 @@ document.querySelectorAll('.add-to-cart-btn').forEach(button => {
             }
         });
     });
+    print(request.session['cart'])
 });
 </script>
 

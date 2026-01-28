@@ -13,7 +13,8 @@ urlpatterns = [
     path('my-orders/<int:order_id>/', views.order_detail, name='order_detail'),
     path('statistics/', views.order_statistics, name='order_statistics'),
     path('statistics/revenue/', views.revenue_statistics, name='revenue_statistics'),
-    
+    path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+
     
 ]
 

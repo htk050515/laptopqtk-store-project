@@ -1,0 +1,20 @@
+{% extends "admin/change_list.html" %}
+{% load humanize %}
+
+{% block content %}
+<div style="
+    background:#f6ffed;
+    border:1px solid #b7eb8f;
+    padding:12px 16px;
+    margin-bottom:15px;
+    border-radius:6px;
+    font-size:16px;
+">
+    💰 <strong>Tổng doanh thu (đơn đã duyệt):</strong>
+    <span style="color:#389e0d;font-weight:bold;">
+        {{ total_revenue|intcomma }} VNĐ
+    </span>
+</div>
+
+{{ block.super }}
+{% endblock %}

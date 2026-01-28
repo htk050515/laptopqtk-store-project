@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from catalog.models import Product
-
+from django.db import transaction
+from django.core.exceptions import ValidationError
 
 class Order(models.Model):
     STATUS_PENDING = 'pending'
@@ -42,6 +43,9 @@ class Order(models.Model):
     def __str__(self):
         return f"Order #{self.id} - {self.user.username}"
 
+    stock_deducted = models.BooleanField(default=False)
+    
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(
@@ -60,3 +64,24 @@ class OrderItem(models.Model):
         return f"{self.product.name} x {self.quantity}"
 
 
+class Order(models.Model):
+    ...
+
+    @transaction.atomic
+    def deduct_stock(self):
+        if self.stock_deducted:
+            return
+
+        for item in self.items.select_related('product'):
+            product = item.product
+
+            if product.stock < item.quantity:
+                raise ValidationError(
+                    f"Sản phẩm {product.name} không đủ tồn kho"
+                )
+
+            product.stock -= item.quantity
+            product.save()
+
+        self.stock_deducted = True
+        self.save(update_fields=['stock_deducted'])

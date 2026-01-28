@@ -123,3 +123,18 @@ def my_orders(request):#Xem danh sách đơn hàng của người dùng
     }
 
     return render(request, 'my_orders.html', context)
+
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(
+        Order,
+        id=order_id,
+        user=request.user
+    )
+
+    context = {
+        'order': order,
+        'items': order.items.all()
+    }
+
+    return render(request, 'order_detail.html', context)

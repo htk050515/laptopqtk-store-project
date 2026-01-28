@@ -45,6 +45,34 @@
         {{ total_revenue|intcomma }} VNĐ
     </span>
 </div>
+<hr>
+
+<h2>🔥 Top sản phẩm bán chạy</h2>
+
+<table class="admin-table" style="width:100%;margin-bottom:20px;">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Sản phẩm</th>
+            <th>Số lượng bán</th>
+            <th>Doanh thu</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in top_products %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ p.product__name }}</td>
+            <td>{{ p.total_qty }}</td>
+            <td>{{ p.revenue|intcomma }} VNĐ</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Chưa có dữ liệu</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <!-- BIỂU ĐỒ -->
 <div style="background:#fff;padding:16px;border:1px solid #ddd;border-radius:6px;margin-bottom:20px;">

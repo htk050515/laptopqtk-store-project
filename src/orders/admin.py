@@ -2,6 +2,10 @@ from django.contrib import admin
 from django.db.models import Count, Sum
 from .models import Order, OrderItem
 from django.db.models.functions import TruncDate
+from django.db.models import Sum, F
+from django.db.models.functions import Coalesce
+from catalog.models import Product
+from .models import OrderItem
 
 
 class OrderItemInline(admin.TabularInline):
@@ -17,6 +21,22 @@ class OrderAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
 
     def changelist_view(self, request, extra_context=None):
+        top_products = (
+            OrderItem.objects
+            .filter(order__status='approved')
+            .values(
+                'product__id',
+                'product__name'
+                )
+        .annotate(
+            total_qty=Sum('quantity'),
+            revenue=Sum(F('price') * F('quantity'))
+        )
+        .order_by('-total_qty')[:5]
+)
+        response.context_data.update({
+    'top_products': top_products,
+})
         response = super().changelist_view(request, extra_context)
 
         try:

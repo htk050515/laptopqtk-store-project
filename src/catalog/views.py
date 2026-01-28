@@ -36,16 +36,37 @@ def add_to_cart_ajax(request, product_id): #Thêm sản phẩm vào giỏ hàng 
     })
 
 
-def home(request): #Trang chủ hiển thị danh mục và sản phẩm
-    categories = Category.objects.filter(is_active=True) #Chỉ hiển thị dữ liệu đang bán
+def home(request):
     products = Product.objects.filter(is_active=True)
 
+    # Tìm kiếm theo tên
+    keyword = request.GET.get('q')
+    if keyword:
+        products = products.filter(name__icontains=keyword)
+
+    # Lọc theo danh mục
+    category_id = request.GET.get('category')
+    if category_id:
+        products = products.filter(category_id=category_id)
+
+    # Sắp xếp
+    sort = request.GET.get('sort')
+    if sort == 'price_asc':
+        products = products.order_by('price')
+    elif sort == 'price_desc':
+        products = products.order_by('-price')
+    else:
+        products = products.order_by('-created_at')
+
+    categories = Category.objects.filter(is_active=True)
+
     context = {
-        'categories': categories,
         'products': products,
+        'categories': categories,
     }
 
     return render(request, 'home.html', context)
+
 
 
 def product_by_category(request, category_id): #Xem sản phẩm theo danh mục

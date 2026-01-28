@@ -20,6 +20,35 @@
 <hr>
 
 <h2>Sản phẩm mới</h2>
+<form method="get" style="margin-bottom: 20px;">
+    <input type="text" name="q" placeholder="Tìm sản phẩm..."
+           value="{{ request.GET.q }}">
+
+    <select name="category">
+        <option value="">-- Tất cả danh mục --</option>
+        {% for cat in categories %}
+            <option value="{{ cat.id }}"
+                {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
+                {{ cat.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="sort">
+        <option value="">Mới nhất</option>
+        <option value="price_asc"
+            {% if request.GET.sort == 'price_asc' %}selected{% endif %}>
+            Giá tăng dần
+        </option>
+        <option value="price_desc"
+            {% if request.GET.sort == 'price_desc' %}selected{% endif %}>
+            Giá giảm dần
+        </option>
+    </select>
+
+    <button type="submit">Lọc</button>
+</form>
+
 
 <div>
     {% for product in products %}
@@ -45,9 +74,6 @@
     {% endfor %}
 </div>
 
-
-{% endblock %}
-
 <script>
 document.querySelectorAll('.add-to-cart-btn').forEach(button => {
     button.addEventListener('click', function () {
@@ -68,3 +94,6 @@ document.querySelectorAll('.add-to-cart-btn').forEach(button => {
     });
 });
 </script>
+
+{% endblock %}
+

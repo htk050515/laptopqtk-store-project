@@ -2,6 +2,30 @@
 {% load humanize %}
 
 {% block content %}
+<!-- DASHBOARD KPI -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+
+  <div style="background:#f0f5ff;padding:12px;border-radius:6px;">
+    📦 <strong>Tổng đơn</strong><br>
+    {{ total_orders }}
+  </div>
+
+  <div style="background:#fff7e6;padding:12px;border-radius:6px;">
+    ⏳ <strong>Chờ duyệt</strong><br>
+    {{ pending_orders }}
+  </div>
+
+  <div style="background:#f6ffed;padding:12px;border-radius:6px;">
+    ✅ <strong>Đã duyệt</strong><br>
+    {{ approved_orders }}
+  </div>
+
+  <div style="background:#e6f7ff;padding:12px;border-radius:6px;">
+    💰 <strong>Doanh thu</strong><br>
+    {{ total_revenue|intcomma }} VNĐ
+  </div>
+
+</div>
 <div style="
     background:#f6ffed;
     border:1px solid #b7eb8f;

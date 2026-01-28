@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.db.models import Sum
+from django.db.models import Count, Sum
 from .models import Order, OrderItem
 from django.db.models.functions import TruncDate
 
@@ -16,11 +16,21 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('status', 'created_at')
     date_hierarchy = 'created_at'
 
-
     def changelist_view(self, request, extra_context=None):
         response = super().changelist_view(request, extra_context)
 
         try:
+            # ====== KPI ======
+            total_orders = Order.objects.count()
+            pending_orders = Order.objects.filter(status='pending').count()
+            approved_orders = Order.objects.filter(status='approved').count()
+            total_revenue = (
+                Order.objects
+                .filter(status='approved')
+                .aggregate(total=Sum('total_price'))['total'] or 0
+            )
+
+            # ====== CHART ======
             qs = (
                 Order.objects
                 .filter(status='approved')
@@ -30,11 +40,14 @@ class OrderAdmin(admin.ModelAdmin):
                 .order_by('date')
             )
 
-            dates = [q['date'].strftime('%d/%m') for q in qs]
-            totals = [float(q['total']) for q in qs]
-
-            response.context_data['chart_labels'] = dates
-            response.context_data['chart_values'] = totals
+            response.context_data.update({
+                'total_orders': total_orders,
+                'pending_orders': pending_orders,
+                'approved_orders': approved_orders,
+                'total_revenue': total_revenue,
+                'chart_labels': [q['date'].strftime('%d/%m') for q in qs],
+                'chart_values': [float(q['total']) for q in qs],
+            })
 
         except Exception:
             pass

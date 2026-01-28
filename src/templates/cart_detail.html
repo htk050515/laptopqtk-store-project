@@ -25,14 +25,19 @@
                     <img src="{{ item.image }}" width="60"><br>
                 {% endif %}
                 {{ item.name }}
-            </td>
+            </td>   
             <td>{{ item.price }} VNĐ</td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.total }} VNĐ</td>
             <td>
+                <button onclick="updateQty({{ key }}, 'decrease')">−</button>
+                    {{ item.quantity }}
+                <button onclick="updateQty({{ key }}, 'increase')">+</button>
+            </td>   
+
+            <td>
                 <button class="remove-item-btn"
-                        data-product-id="{{ key }}">
-                    Xóa
+                        data-product-id="{{ key }}"> Xóa
                 </button>
             </td>
         </tr>
@@ -79,5 +84,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+<script>
+function updateQty(productId, action) {
+    fetch(`/cart/update/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `action=${action}`
+    }).then(() => location.reload());
+}
+</script>
+
 
 {% endblock %}

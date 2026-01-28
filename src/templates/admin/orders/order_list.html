@@ -1,0 +1,33 @@
+<h2>Quản lý đơn hàng</h2>
+
+<table border="1" cellpadding="10">
+    <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>Tổng tiền</th>
+        <th>Trạng thái</th>
+        <th>Hành động</th>
+    </tr>
+
+    {% for order in orders %}
+    <tr>
+        <td>#{{ order.id }}</td>
+        <td>{{ order.user.username }}</td>
+        <td>{{ order.total_price }} VNĐ</td>
+        <td>{{ order.status }}</td>
+        <td>
+            {% if order.status == 'pending' %}
+                <a href="{% url 'admin_update_order_status' order.id 'approved' %}">
+                    ✅ Duyệt
+                </a>
+                |
+                <a href="{% url 'admin_update_order_status' order.id 'rejected' %}">
+                    ❌ Từ chối
+                </a>
+            {% else %}
+                
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>

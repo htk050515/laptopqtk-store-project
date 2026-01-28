@@ -23,6 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),  # ✅ QUAN TRỌNG
     path('', include('catalog.urls')),
+    path('', include('orders.urls')),
+    
 ]
 
 # Cấu hình phục vụ ảnh media trong quá trình phát triển

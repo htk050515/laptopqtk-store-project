@@ -8,6 +8,9 @@ from .models import Category, Product
 from django.contrib.auth.decorators import login_required
 from orders.models import Order, OrderItem
 from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Sum
+from django.db.models.functions import TruncDate
+
 
 
 def add_to_cart(request, product_id): #Thêm sản phẩm vào giỏ hàng
@@ -154,3 +157,25 @@ def order_statistics(request): #Thống kê số lượng đơn hàng theo trạ
     }
 
     return render(request, 'order_statistics.html', context)
+
+
+@staff_member_required
+def revenue_statistics(request):
+    data = (
+        Order.objects
+        .filter(status='approved')
+        .annotate(date=TruncDate('created_at'))
+        .values('date')
+        .annotate(total=Sum('total_price'))
+        .order_by('date')
+    )
+
+    labels = [item['date'].strftime('%d/%m/%Y') for item in data]
+    values = [float(item['total']) for item in data]
+
+    context = {
+        'labels': labels,
+        'values': values,
+    }
+
+    return render(request, 'revenue_statistics.html', context)

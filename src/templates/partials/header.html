@@ -15,7 +15,8 @@
             <a href="#">Đăng ký</a>
         {% endif %}
         {% if user.is_staff %}
-    <a href="{% url 'order_statistics' %}">Thống kê</a>
+            <a href="{% url 'order_statistics' %}">Thống kê đơn</a>
+            <a href="{% url 'revenue_statistics' %}">Doanh thu</a>
 {% endif %}
     </nav>
 </header>

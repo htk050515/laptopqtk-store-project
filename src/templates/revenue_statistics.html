@@ -1,28 +1,26 @@
-{% extends 'base.html' %}
-
-{% block title %}Thống kê doanh thu{% endblock %}
-
+{% extends "admin/base_site.html" %}
 {% block content %}
 
-<h2>Doanh thu theo ngày</h2>
+<h1>📊 Doanh thu theo ngày</h1>
 
-<canvas id="revenueChart" width="600" height="300"></canvas>
+<canvas id="revenueChart" height="120"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-const ctx = document.getElementById('revenueChart');
+const labels = {{ labels|safe }};
+const values = {{ values|safe }};
 
-new Chart(ctx, {
+new Chart(document.getElementById('revenueChart'), {
     type: 'line',
     data: {
-        labels: {{ labels|safe }},
+        labels: labels,
         datasets: [{
             label: 'Doanh thu (VNĐ)',
-            data: {{ values|safe }},
-            tension: 0.3,
+            data: values,
+            borderWidth: 2,
+            fill: false,
         }]
-    },
+    }
 });
 </script>
 

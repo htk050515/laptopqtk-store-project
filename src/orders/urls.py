@@ -8,4 +8,5 @@ urlpatterns = [
         views.admin_update_order_status,
         name='admin_update_order_status'
     ),
+    path('admin/revenue/', views.revenue_statistics, name='revenue_statistics'),
 ]

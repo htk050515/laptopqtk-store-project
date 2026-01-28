@@ -7,71 +7,77 @@
 <h2>Giỏ hàng của bạn</h2>
 
 {% if cart_items %}
-    <table border="1" cellpadding="10">
-        <thead>
-            <tr>
-                <th>Sản phẩm</th>
-                <th>Giá</th>
-                <th>Số lượng</th>
-                <th>Thành tiền</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for key, item in cart_items.items %}
-                <tr>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.price }} VNĐ</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.total }} VNĐ</td>
-                    <td>
-                        <button class="remove-item-btn"
-                                data-product-id="{{ key }}">
-                            Xóa
-                        </button>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<table border="1" cellpadding="10" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Giá</th>
+            <th>Số lượng</th>
+            <th>Thành tiền</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key, item in cart_items.items %}
+        <tr>
+            <td>
+                {% if item.image %}
+                    <img src="{{ item.image }}" width="60"><br>
+                {% endif %}
+                {{ item.name }}
+            </td>
+            <td>{{ item.price }} VNĐ</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.total }} VNĐ</td>
+            <td>
+                <button class="remove-item-btn"
+                        data-product-id="{{ key }}">
+                    Xóa
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <h3>Tổng tiền: {{ total_price }} VNĐ</h3>
+<h3>Tổng tiền: {{ total_price }} VNĐ</h3>
 
 {% else %}
-    <p>Giỏ hàng trống.</p>
+<p>Giỏ hàng trống.</p>
+{% endif %}
+
+{% if user.is_authenticated and cart_items %}
+<form action="{% url 'create_order' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Đặt hàng</button>
+</form>
+{% elif not user.is_authenticated and cart_items %}
+<p>
+    <a href="{% url 'login' %}">Đăng nhập</a> để đặt hàng
+</p>
 {% endif %}
 
 <script>
-document.querySelectorAll('.remove-item-btn').forEach(button => {
-    button.addEventListener('click', function () {
-        const productId = this.dataset.productId;
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.remove-item-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const productId = this.dataset.productId;
 
-        fetch(`/remove-from-cart/${productId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            }
+            fetch(`/remove-from-cart/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
         });
     });
 });
 </script>
 
-{% if user.is_authenticated %}
-    <form action="{% url 'create_order' %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Đặt hàng</button>
-    </form>
-{% else %}
-    <p>
-        <a href="/login/">Đăng nhập</a> để đặt hàng
-    </p>
-{% endif %}
-
 {% endblock %}
-

@@ -98,24 +98,39 @@ def product_detail(request, product_id): #Xem chi tiết sản phẩm
 
     return render(request, 'product_detail.html', context)
 
-def cart_detail(request): #Xem chi tiết giỏ hàng
-    cart = Cart(request)
+def cart_detail(request):
+    cart = request.session.get('cart', {})
+    total_price = 0
+
+    # Tính thành tiền cho từng item
+    for item in cart.values():
+        item['total'] = item['price'] * item['quantity']
+        total_price += item['total']
 
     context = {
-        'cart_items': cart.get_items(),
-        'total_price': cart.get_total_price(),
+        'cart_items': cart,
+        'total_price': total_price
     }
 
     return render(request, 'cart_detail.html', context)
-
+    
 @require_POST
-def remove_from_cart(request, product_id): #Xóa sản phẩm khỏi giỏ hàng
-    cart = Cart(request)
-    cart.remove(product_id)
+def remove_from_cart(request, product_id):
+    if request.method == 'POST':
+        cart = request.session.get('cart', {})
+        pid = str(product_id)
 
-    return JsonResponse({
-        'success': True
-    })
+        if pid in cart:
+            del cart[pid]
+            request.session['cart'] = cart
+            request.session.modified = True
+
+        return JsonResponse({
+            'success': True
+        })
+
+    return JsonResponse({'success': False}, status=400)
+
 
 @login_required #Yêu cầu đăng nhập để tạo đơn hàng
 def create_order(request): #Tạo đơn hàng từ giỏ hàng
@@ -232,3 +247,16 @@ def revenue_statistics(request):
         'message': 'Đã thêm vào giỏ hàng'
     })
 
+def cart_detail(request):
+    cart = request.session.get('cart', {})
+
+    total_price = 0
+    for item in cart.values():
+        total_price += item['price'] * item['quantity']
+
+    context = {
+        'cart': cart,
+        'total_price': total_price
+    }
+
+    return render(request, 'cart_detail.html', context)

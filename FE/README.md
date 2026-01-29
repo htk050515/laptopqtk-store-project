@@ -1,0 +1,11 @@
+
+  # Website LAPTOPQTK
+
+  This is a code bundle for Website LAPTOPQTK. The original project is available at https://www.figma.com/design/ojHTN4pqMubViI0MmumCMl/Website-LAPTOPQTK.
+
+  ## Running the code
+
+  Run `npm i` to install the dependencies.
+
+  Run `npm run dev` to start the development server.
+  
